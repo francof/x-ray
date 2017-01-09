@@ -17,12 +17,13 @@ var walk = require('./lib/walk')
 var fs = require('fs')
 
 var CONST = {
-  CRAWLER_METHODS: ['concurrency', 'throttle', 'timeout', 'driver', 'delay', 'limit'],
+  CRAWLER_METHODS: ['concurrency', 'throttle', 'timeout', 'driver', 'delay', 'limit', 'callback'],
   INIT_STATE: {
     stream: false,
     concurrency: Infinity,
     paginate: false,
-    limit: Infinity
+    limit: Infinity,
+    callback: false
   }
 }
 
@@ -124,6 +125,9 @@ function Xray (options) {
 
           stream(obj)
 
+          if(state.callback)
+            state.callback(obj, url);
+
           // debug
           debug('paginating %j', url)
           isFinite(limit) && debug('%s page(s) left to crawl', limit)
@@ -139,6 +143,12 @@ function Xray (options) {
         }
       }
 
+      return node
+    }
+
+    node.callback = function (validator) {
+      if (!arguments.length) return state.callback
+      state.callback = validator
       return node
     }
 
@@ -246,3 +256,4 @@ function WalkHTML (xray, selector, scope, filters) {
 }
 
 module.exports = Xray
+
