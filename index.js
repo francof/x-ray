@@ -138,6 +138,8 @@ function Xray (options) {
             walkHTML($, next)
           })
         } else {
+          if(state.callback)
+            state.callback(obj, url);
           stream(obj, true)
           fn(null, obj)
         }
